@@ -11,13 +11,13 @@ import java.lang.StringBuilder;
  * Bugs: None
  */
 public class AoCday6pt2 {
-    
+
     /**
      * Main method
      * @param args
      */
     public static void main(String[] args) {
-        cephalopod("AoC_day6_input.txt");
+        System.out.println(cephalopod("AoC_day6_input.txt"));
     }
 
     /**
@@ -25,9 +25,58 @@ public class AoCday6pt2 {
      * @param filename name of the file
      * @return cephalopod's math problem answer
      */
-    public static void cephalopod(String filename) {
-        getRangeArr(filename);
-        inputTo2DCharArr(filename);
+    public static long cephalopod(String filename) {
+        long finalResult = 0;
+
+        // Initialize arraylists
+        ArrayList<Integer> rangeArr = getRangeArr(filename);
+        ArrayList<ArrayList<Character>> charArr = inputTo2DCharArr(filename);
+
+        int problemIdx = 0; // Index of rangeArr
+        int problemSize = 0; // Range of problem
+        boolean isMult = false; // Whether problem is *
+        ArrayList<Long> problemNums = new ArrayList<>(); // Nums in problem
+
+        // Loop through columns of charArr
+        for (int i = 0; i <= charArr.get(0).size(); i++) {
+            // Check if digits of problem have been exhaused (and not first)
+            if (problemSize == 0) {
+
+                // Check for initial index 
+                if (i != 0) {
+                    i ++; // Skip over free space 
+                    problemIdx ++; // Goto next problem
+
+                    long result = doMath(problemNums, isMult); // Do actual math
+                    finalResult += result; // Add it to the final sum
+
+                    System.out.println(problemNums + " Multiplication: " 
+                        + isMult + " Result: " + result);
+                    System.out.println();
+                }
+                // If is out of bounds (ie last problem has been solved)
+                if (i == charArr.get(0).size() + 1) {
+                    break; // Stop loop
+                }
+                // Reinitialize vars
+                problemSize = Math.abs(rangeArr.get(problemIdx)); 
+                isMult = (rangeArr.get(problemIdx) < 0); 
+                problemNums.clear();
+
+            }
+            
+            // Build the numbers
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < charArr.size() - 1; j++) {
+                sb.append(charArr.get(j).get(i));
+            }
+            // Add it to the current arr for this problem
+            problemNums.add(Long.parseLong(sb.toString().trim()));
+
+            problemSize --;
+        }
+
+        return finalResult;
     }
 
     /**
@@ -72,7 +121,6 @@ public class AoCday6pt2 {
             }
             // Adds final cnt
             rangeArray.add(isMult * range);
-            System.out.println(rangeArray);
             return rangeArray;
 
         // Handle FNFE
@@ -104,12 +152,12 @@ public class AoCday6pt2 {
                 arr.add(row); // Adds the row
             }
 
-            for (ArrayList<Character> cArr : arr) {
-                for (char c : cArr) {
-                    System.out.print(c + " ");
-                }
-                System.out.println();
-            }
+            // for (ArrayList<Character> cArr : arr) {
+            //     for (char c : cArr) {
+            //         System.out.print(c + " ");
+            //     }
+            //     System.out.println();
+            // }
 
             return arr;
 
@@ -120,5 +168,28 @@ public class AoCday6pt2 {
         }
 
     } 
+
+    /**
+     * If isMult is true, multiplies the numbers; otherwise add them
+     * @param nums the list of numbers
+     * @param isMult whether to multiply (or to add)
+     * @return result
+     */
+    public static long doMath(ArrayList<Long> nums, boolean isMult) {
+        long result;
+        if (isMult) {
+            result = 1;
+            for (long num : nums) {
+                result *= num;
+            }
+        } 
+        else {
+            result = 0;
+            for (long num : nums) {
+                result += num;
+            }
+        }
+        return result;
+    }
 
 }
