@@ -1,0 +1,10 @@
+.DS_Store
+
+# Puzzle inputs
+*.txt
+
+# Java build artifacts
+*.class
+*.jar
+/bin/
+/out/
